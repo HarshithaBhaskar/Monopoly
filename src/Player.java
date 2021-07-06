@@ -6,12 +6,15 @@ public class Player {
   String name;
   List<String> tilesOwned;
   int availableBalance;
-  int xPos;
-  int yPos;
+  int row;
+  int col;
+  int housesOwned;
 
   public Player(String name) {
     this.name = name;
     this.tilesOwned = new ArrayList<>();
+    this.availableBalance = 20000;
+    this.housesOwned = 0;
   }
 
 //  public void setAvailableBalance(int availableBalance) {
@@ -31,14 +34,23 @@ public class Player {
     return tilesOwned;
   }
 
+  public void buyProperty(String tileName, int tilePrice){
+    this.tilesOwned.add(tileName);
+    this.availableBalance -= tilePrice;
+  }
+
+  public void buyHouse(int housePrice){
+    this.availableBalance -= housePrice;
+    this.housesOwned++;
+  }
+
   public int getAvailableBalance() {
     return availableBalance;
   }
 
-    // TODO: Figure this out
-  public void setPosition(int xPos, int yPos){
-    this.xPos = xPos;
-    this.yPos = yPos;
+  public void setPosition(int row, int col){
+    this.row = row;
+    this.col = col;
   }
 
 

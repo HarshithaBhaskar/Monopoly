@@ -1,33 +1,33 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GameManager {
 
   private List<String> playerNames;
+//  private Map<String, List<String>> purchasedTiles;
 
   public GameManager(List<String> playerNames, int numberOfTurns) {
     this.playerNames = playerNames;
+//    this.purchasedTiles = new HashMap<>();
     Tile[][] gameboard = this.makeGameboard();
     this.addPlayers(gameboard);
-//    System.out.println(this.showGameboard(gameboard));
     this.playGame(numberOfTurns, gameboard);
-    System.out.println(this.showGameboard(gameboard));
   }
 
-  private void playGame(int numberOfTurns, Tile[][] gameboard){
+  private void playGame(int numberOfTurns, Tile[][] gameboard) {
     List<Player> players = new ArrayList<>();
 
     for (String playerName : this.playerNames) {
       players.add(new Player(playerName));
     }
 
-    for (int i = 0; i < numberOfTurns; i++){
-      for (Player player: players) {
+    for (int i = 0; i < numberOfTurns; i++) {
+      for (Player player : players) {
         int steps = this.rollDice();
-//        System.out.println(steps);
         this.move(player, steps, gameboard);
-//        System.out.println(player.name + " = " + player.xPos + " | " + player.yPos);
       }
 
     }
@@ -69,158 +69,98 @@ public class GameManager {
   private void move(Player player, int steps, Tile[][] gameboard) {
 
     System.out.println("MOVE - " + player);
+    int playerRow = player.row;
+    int playerCol = player.col;
 
-    gameboard[player.xPos][player.yPos].removePlayerFromTile(player);
+    gameboard[playerRow][playerCol].removePlayerFromTile(player);
 
-    if (player.xPos == 0 && player.yPos == 0) {
-//      movePlayer(player, 9, steps, "h");
-      int currentSteps = 9 - player.yPos;
-
-      if (steps <= currentSteps){
-        player.yPos += steps;
-        gameboard[player.xPos][player.yPos].addPlayerOnTile(player);
-      } else {
-        player.yPos = 9;
-        this.move(player, steps - currentSteps, gameboard);
-      }
-    } else if (player.xPos == 0 && player.yPos == 9) {
-//      movePlayer(player, 9, steps, "v");
-
-      int currentSteps = Math.abs(9 - player.xPos);
-
-      if (steps <= currentSteps){
-        player.xPos += steps;
-        gameboard[player.xPos][player.yPos].addPlayerOnTile(player);
-      } else {
-        player.xPos = 9;
-        this.move(player, steps - currentSteps, gameboard);
-      }
-    } else if (player.xPos == 9 && player.yPos == 0) {
-//      movePlayer(player, 0, steps, "v");
-
-      int currentSteps = Math.abs(0 - player.xPos);
-
-      if (steps <= currentSteps){
-        player.xPos -= steps;
-        gameboard[player.xPos][player.yPos].addPlayerOnTile(player);
-      } else {
-        player.xPos = 0;
-        this.move(player, steps - currentSteps, gameboard);
-      }
-    } else if (player.xPos == 9 && player.yPos == 9) {
-//      movePlayer(player, 0, steps, "h");
-      int currentSteps = Math.abs(0 - player.yPos);
-
-      if (steps <= currentSteps){
-        player.yPos -= steps;
-        gameboard[player.xPos][player.yPos].addPlayerOnTile(player);
-      } else {
-        player.yPos = 0;
-        this.move(player, steps - currentSteps, gameboard);
-      }
-    } else if (player.xPos == 0) {
-
-//      movePlayer(player, 9, steps, "h");
-
-      int currentSteps = 9 - player.yPos;
-
-      if (steps <= currentSteps){
-        player.yPos += steps;
-        gameboard[player.xPos][player.yPos].addPlayerOnTile(player);
-      } else {
-        player.yPos = 9;
-        this.move(player, steps - currentSteps, gameboard);
-      }
-
-      // Move direction right +y
-    } else if (player.xPos == 9) {
-
-//      movePlayer(player, 0, steps, "h");
-
-      int currentSteps = Math.abs(0 - player.yPos);
-
-      if (steps <= currentSteps){
-        player.yPos -= steps;
-        gameboard[player.xPos][player.yPos].addPlayerOnTile(player);
-      } else {
-        player.yPos = 0;
-        this.move(player, steps - currentSteps, gameboard);
-      }
-
-      // Move direction left -y
-    } else if (player.yPos == 0) {
-
-//      movePlayer(player, 0, steps, "v");
-
-      int currentSteps = Math.abs(0 - player.xPos);
-
-      if (steps <= currentSteps){
-        player.xPos -= steps;
-        gameboard[player.xPos][player.yPos].addPlayerOnTile(player);
-      } else {
-        player.xPos = 0;
-        this.move(player, steps - currentSteps, gameboard);
-      }
-
-      // Move direction up -x
-    } else if (player.yPos == 9) {
-
-//      movePlayer(player, 9, steps, "v");
-
-      int currentSteps = Math.abs(9 - player.xPos);
-
-      if (steps <= currentSteps){
-        player.xPos += steps;
-        gameboard[player.xPos][player.yPos].addPlayerOnTile(player);
-      } else {
-        player.xPos = 9;
-        this.move(player, steps - currentSteps, gameboard);
-      }
-
-      // Move direction down +x
+    if (playerRow == 0 && playerCol < 9) {
+      movePlayer(player, steps, 9, gameboard, "h");
+    } else if (playerRow < 9 && playerCol == 0) {
+      movePlayer(player, steps, 0, gameboard, "v");
+    } else if (playerRow == 9) {
+      movePlayer(player, steps, 0, gameboard, "h");
+    } else if (playerCol == 9) {
+      movePlayer(player, steps, 9, gameboard, "v");
     }
   }
 
-//  private void movePlayer(Player player, int moveDirectionBound, int steps, String direction) {
-//    int vector = 0;
-//
-//    if (direction.equals("h")){
-//      vector = player.yPos;
-//    } else {
-//      vector = player.xPos;
-//    }
-//
-//    System.out.println(player.name + player.xPos + player.yPos);
-//    System.out.println(vector);
-//    int currentSteps = Math.abs(moveDirectionBound - vector);
-//    System.out.println(currentSteps);
-//    int changeInSteps;
-//
-//    if (moveDirectionBound == 0) {
-//      changeInSteps = 0 - steps;
-//    } else {
-//      changeInSteps = steps;
-//    }
-//
-//    System.out.println(changeInSteps);
-//
-//    if (steps <= currentSteps) {
-//      vector += changeInSteps;
-//      System.out.println("VECTOR = " + vector);
-//    } else {
-//      vector = moveDirectionBound;
-//      System.out.println("VECTOR = " + vector);
-//      this.move(player, steps - currentSteps);
-//    }
-//    System.out.println(player.name + "//" + player.xPos + "//" + player.yPos);
-//  }
+  private void movePlayer(Player player, int steps, int moveBound, Tile[][] gameboard, String moveVector) {
 
-  private String showGameboard(Tile[][] gameboard){
+    int playerRow = player.row;
+    int playerCol = player.col;
+
+    if (moveVector.equals("h")) {
+
+      int currentSteps = Math.abs(moveBound - playerCol);
+
+      if (steps <= currentSteps) {
+        playerCol += steps;
+        player.setPosition(playerRow, playerCol);
+        gameboard[playerRow][playerCol].addPlayerOnTile(player);
+        this.payRent(player, gameboard);
+      } else {
+        playerCol = moveBound;
+        player.setPosition(playerRow, playerCol);
+        this.move(player, steps - currentSteps, gameboard);
+      }
+
+    } else if (moveVector.equals("v")) {
+
+      int currentSteps = Math.abs(moveBound - playerRow);
+
+      if (steps <= currentSteps) {
+        playerRow += steps;
+        player.setPosition(playerRow, playerCol);
+        gameboard[playerRow][playerCol].addPlayerOnTile(player);
+        this.payRent(player, gameboard);
+      } else {
+        playerRow = moveBound;
+        player.setPosition(playerRow, playerCol);
+        this.move(player, steps - currentSteps, gameboard);
+      }
+
+    }
+
+  }
+
+  private void buyProperty(Player player, Tile[][] gameboard) {
+//    List<String> ownedProperties = new ArrayList<>(this.purchasedTiles.values());
+//    List<String> ownedProperties = this.purchasedTiles.values().stream().flatMap(List::stream).collect(Collectors.toList());
+//    boolean isOwned = ownedProperties.contains(gameboard[player.row][player.col].name);
+    Tile property = gameboard[player.row][player.col];
+    boolean isOwned = property.ownedBy != null;
+
+    if (!isOwned) {
+//      List<String> property = new ArrayList<>();
+//      property.add(gameboard[player.row][player.col].name);
+//      this.purchasedTiles.put(player.name, property);
+      player.buyProperty(gameboard[player.row][player.col].name, gameboard[player.row][player.col].purchasePrice);
+      property.setOwner(player);
+    } else {
+      System.out.println("THIS PROPERTY IS OWNED. YOU CANNOT BUY IT");
+    }
+  }
+
+  private void buyHouse(Player player, Tile[][] gameboard) {
+//    List<String> propertiesPlayerOwns = this.purchasedTiles.get(player.name);
+    Tile property = gameboard[player.row][player.col];
+    boolean playerOwnsProperty = player.tilesOwned.contains(property.name);
+
+    if (playerOwnsProperty) {
+      Tile currentTile = gameboard[player.row][player.col];
+//      player.buyProperty(currentTile.name, currentTile.housePrice);
+      player.buyHouse(currentTile.housePrice);
+      currentTile.updateRent(currentTile.housePrice, 0);
+    } else {
+      System.out.println("YOU DO NOT OWN THIS PROPERTY. YOU CANNOT BUY A HOUSE HERE");
+    }
+  }
+
+  private String showGameboard(Tile[][] gameboard) {
     String board = "";
-    for (int i = 0; i < 10; i++){
-      for (int j = 0; j < 10; j++){
-//        System.out.println(i);
-//        System.out.println(j);
+    for (int i = 0; i < 10; i++) {
+      for (int j = 0; j < 10; j++) {
         board = board.concat(gameboard[i][j].render());
       }
       board = board.concat("\n");
@@ -228,12 +168,23 @@ public class GameManager {
     return board;
   }
 
-  public static void main(String[] args){
+  private void payRent(Player player, Tile[][] gameboard){
+    int rentOwed = gameboard[player.row][player.col].rent;
+    Player owner = gameboard[player.row][player.col].ownedBy;
+
+    if (owner != null){
+      player.availableBalance -= rentOwed;
+      owner.availableBalance += rentOwed;
+    }
+
+  }
+
+  public static void main(String[] args) {
     List<String> players = new ArrayList<>();
     players.add("Amber");
     players.add("Ashley");
 
-    new GameManager(players, 1);
+    new GameManager(players, 4);
   }
 
 }

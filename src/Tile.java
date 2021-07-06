@@ -9,6 +9,9 @@ public class Tile {
   List<Player> players;
   int purchasePrice;
   boolean isTraversable;
+  int housePrice;
+  int rent;
+  Player ownedBy;
 
   // Edge Place Tile
   public Tile(String name, int purchasePrice) {
@@ -16,6 +19,9 @@ public class Tile {
     this.purchasePrice = purchasePrice;
     this.players = new ArrayList<>();
     this.isTraversable = true;
+    this.housePrice = (1/3) * this.purchasePrice;
+    this.rent = (1/5) * this.purchasePrice;
+    this.ownedBy = null;
   }
 
   // Empty Center Tile
@@ -25,6 +31,9 @@ public class Tile {
     this.isTraversable = false;
     this.purchasePrice = 0;
     this.players = null;
+    this.housePrice = 0;
+    this.rent = 0;
+    this.ownedBy = null;
   }
 
   public String getName() {
@@ -93,5 +102,14 @@ public class Tile {
     }
 
     return renderedTile;
+  }
+
+  public void updateRent(int incrementAmount, int decrementAmount){
+    this.rent += incrementAmount;
+    this.rent -= decrementAmount;
+  }
+
+  public void setOwner(Player player){
+    this.ownedBy = player;
   }
 }
